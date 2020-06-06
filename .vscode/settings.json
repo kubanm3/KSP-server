@@ -4,5 +4,11 @@
     "editor.formatOnType": true, 
     "jshint.options": {
         "esversion": 6
-    }
+    },
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/a97e887b-8273-4f38-8ee8-95eb27cb1281/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/KSP-project",
+    "appService.deploySubpath": "."
 }

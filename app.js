@@ -1,8 +1,31 @@
 const express = require("express");
-const app = express();
+const http = require("http");
+const socketio = require("socket.io");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv/config");
+
+const app = express();
+const server = http.createServer(app);
+const io = socketio(server);
+
+//run when client connects
+io.on("connection", (socket) => {
+  console.log("New websocket connection");
+
+  //welcome current user
+  socket.emit("message", "Welcome to ksp server");
+
+  //broadcast to other users
+  socket.broadcast.emit("message", "new connection has been made");
+
+  //runs on disconnection
+  socket.on("disconnect", () => {
+    io.emit("message", "user disconnected");
+  });
+});
+
+const PORT = process.env.PORT || 3000;
 
 //middlewares
 app.use(cors());
@@ -23,4 +46,4 @@ mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true }, () =>
 );
 
 //listen to server
-app.listen(3000);
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
