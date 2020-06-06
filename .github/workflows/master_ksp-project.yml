@@ -31,5 +31,5 @@ jobs:
       with:
         app-name: 'ksp-project'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_81c44a8571314c99a50810986ee892a5 }}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_450eb4b658d44df98712b053f9d1c6b8 }}
         package: .
