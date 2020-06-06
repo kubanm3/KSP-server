@@ -37,13 +37,13 @@ app.use("/posts", postsRoute);
 
 //ROUTES
 app.get("/", (req, res) => {
-  res.send("We are on home");
+  res.send("We are on homes");
 });
 
-//connect to db
-mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true }, () =>
-  console.log("connected to db!")
-);
+// //connect to db
+// mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true }, () =>
+//   console.log("connected to db!")
+// );
 
 //listen to server
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
