@@ -20,23 +20,24 @@ app.use(express.static(path.join(__dirname, "public")));
 
 let currentUsers = new Set();
 let currentValue = 0;
-let dataReceived = true;
 
 //run when client connects
 io.on("connection", (socket) => {
   currentUsers.add(socket.id);
 
-  //welcome current user
-  socket.emit("message", "Welcome to ksp server");
-  //broadcast to other users
-  socket.broadcast.emit("message", "new connection has been made");
-
   //updates current value and broadcasts it
   socket.on("currentValue", (value) => {
-    console.info(`Socket ${socket.id} says: "${value}"`, typeof value);
     currentValue = value;
     socket.broadcast.emit("currentValue", {
       value: currentValue,
+    });
+  });
+
+  //send confirmation to sensor
+  socket.on("confirmation", (confirmation) => {
+    socket.broadcast.emit("userConfirmation", {
+      user: socket.id,
+      value: confirmation,
     });
   });
 
