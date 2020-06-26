@@ -6,54 +6,61 @@ const cors = require("cors");
 require("dotenv/config");
 
 const PORT = process.env.PORT || 3000;
-
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
+const connectionsLimit = 5;
 
-//middlewares
 app.use(cors());
 app.use(express.json());
 
-//import routes
 app.use(express.static(path.join(__dirname, "public")));
 
-let currentUsers = new Set();
-let currentValue = 0;
+let currentUsers = new Array(connectionsLimit).fill(0);
 
-//run when client connects
 io.on("connection", (socket) => {
-  currentUsers.add(socket.id);
+  socket.on("createRoom", function (room) {
+    if (countUsers() >= connectionsLimit) {
+      socket.emit(
+        "err",
+        "Max number of users surpassed, limit: " + connectionsLimit
+      );
+      socket.disconnect();
+      return;
+    }
+    socket.join(room);
+    currentUsers[currentUsers.indexOf(0)] = socket.id;
 
-  //updates current value and broadcasts it
-  socket.on("currentValue", (value) => {
-    currentValue = value;
+    io.emit("currentUsers", {
+      users: countUsers(),
+    });
+  });
+
+  socket.on("currentValue", (currentValue) => {
     socket.broadcast.emit("currentValue", {
       value: currentValue,
     });
   });
 
-  //send confirmation to sensor
   socket.on("confirmation", (confirmation) => {
     socket.broadcast.emit("userConfirmation", {
-      user: socket.id,
+      user: currentUsers.indexOf(socket.id) + 1,
       value: confirmation,
     });
   });
 
-  //updates current users
-  io.emit("currentUsers", {
-    users: currentUsers.size,
-  });
-
-  //runs on disconnection
   socket.on("disconnect", () => {
-    currentUsers.delete(socket.id);
+    currentUsers[currentUsers.indexOf(socket.id)] = 0;
     io.emit("currentUsers", {
-      users: currentUsers.size,
+      users: countUsers(),
     });
   });
 });
 
-//listen to server
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+function countUsers() {
+  return currentUsers.filter(function (value) {
+    return value !== 0;
+  }).length;
+}
