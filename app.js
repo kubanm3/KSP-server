@@ -19,6 +19,10 @@ app.use(express.static(path.join(__dirname, "public")));
 let currentUsers = new Array(connectionsLimit).fill(0);
 
 io.on("connection", (socket) => {
+  io.emit("currentUsers", {
+    users: countUsers(),
+  });
+
   socket.on("createRoom", function (room) {
     if (countUsers() >= connectionsLimit) {
       socket.emit(
