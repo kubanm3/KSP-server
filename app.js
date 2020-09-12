@@ -54,6 +54,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+    socket.broadcast.emit("userConfirmation", {
+      user: currentUsers.indexOf(socket.id) + 1,
+      value: false,
+    });
     currentUsers[currentUsers.indexOf(socket.id)] = 0;
     io.emit("currentUsers", {
       users: countUsers(),
